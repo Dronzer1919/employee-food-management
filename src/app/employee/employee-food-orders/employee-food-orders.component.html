@@ -1,0 +1,93 @@
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Employee Food Order Details</h1>
+  <div class="accordion" id="foodOrderAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="userDetailsHeader">
+        <button class="accordion-button d-flex align-items-center" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseUserDetails" aria-expanded="true" aria-controls="collapseUserDetails">
+          <div class="user-badge text-white me-3 d-flex align-items-center justify-content-center">
+            {{ user?.f_name?.charAt(0) || '?' }}
+          </div>
+          <div>
+            <strong>{{ user?.f_name }} {{ user?.l_name || '' }}</strong>
+            - {{ user?.email }} - Phone: {{ user?.phone }} - Employee ID: {{ user?.emp_id }}
+          </div>
+        </button>
+      </h2>
+      <div id="collapseUserDetails" class="accordion-collapse collapse show" aria-labelledby="userDetailsHeader"
+        data-bs-parent="#foodOrderAccordion">
+        <div class="accordion-body">
+          <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+            <div class="col-4">
+              <h5 class="mb-0">Monthly Food Report</h5>
+
+            </div>
+
+            <div class="col-4">
+              <form [formGroup]="monthForm" class="w-100">
+                <div class="mb-3 w-100">
+                  <input type="text" class="form-control w-100" id="month" formControlName="month" maxlength="2"
+                    placeholder="Enter month number between 1 and 12" (keydown.enter)="onEnter()" />
+                </div>
+
+                <div *ngIf="monthForm.get('month')?.invalid && monthForm.get('month')?.touched"
+                  class="text-danger d-flex flex-column">
+                  <small *ngIf="monthForm.get('month')?.hasError('required')">Month is required.</small>
+                  <small *ngIf="monthForm.get('month')?.hasError('pattern')">Please enter a valid month (01-12).</small>
+                  <small *ngIf="monthForm.get('month')?.hasError('min')">Month should be greater than 0.</small>
+                  <small *ngIf="monthForm.get('month')?.hasError('max')">Month should be less than or equal to
+                    12.</small>
+                </div>
+              </form>
+            </div>
+            <div class="col-4 text-end">
+              <h5 class="mb-0 text-danger ms-2">Total Fine: Rs {{ totalFine }}</h5>
+            </div>
+          </div>
+          <table class="table table-bordered table-striped">
+            <thead class="table-primary">
+              <tr>
+                <th>Date</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+                <th>Fine (Rs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let report of paginatedFoodOrders">
+                <td>{{ report.date | date:'medium'}}</td>
+                <td [ngClass]="{'bg-warning text-white': report.breakfast === 'Pending'}">{{ report.breakfast }}</td>
+                <td [ngClass]="{'bg-warning text-white': report.lunch === 'Pending'}">{{ report.lunch }}</td>
+                <td [ngClass]="{'bg-warning text-white': report.dinner === 'Pending'}">{{ report.dinner }}</td>
+                <td>
+                  {{
+                  (report.breakfast === 'Pending' ? 100 : 0) +
+                  (report.lunch === 'Pending' ? 100 : 0) +
+                  (report.dinner === 'Pending' ? 100 : 0)
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination-controls d-flex justify-content-center mt-3">
+            <button class="btn btn-secondary mx-2" (click)="firstPage()" [disabled]="currentPage === 1">
+              <i class="bi bi-skip-start"></i> First
+            </button>
+            <button class="btn btn-secondary mx-2" (click)="prevPage()" [disabled]="currentPage === 1">
+              <i class="bi bi-arrow-left-circle"></i> Previous
+            </button>
+            <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button class="btn btn-secondary mx-2" (click)="nextPage()" [disabled]="currentPage === totalPages">
+              <i class="bi bi-arrow-right-circle"></i> Next
+            </button>
+            <button class="btn btn-secondary mx-2" (click)="lastPage()" [disabled]="currentPage === totalPages">
+              <i class="bi bi-skip-end"></i> Last
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
